@@ -59,6 +59,14 @@ DONE (live on machine, NOT yet pushed to repo — push at end of session):
   (extract == staging). fzf NOT in payload/list (experiment scrapped).
   Known-good snapshot: ~/opencode/build-backups/waybar-good-*. Not committed
   or pushed yet — user said save locally only.
+- Dev environment packed into repo under dev/ (Nov 17 2026): setup-dev.sh
+  (one-shot idempotent env setup), skill/supraos-dev/SKILL.md (enforces
+  Omarchy/upstream research-first, minimal, auto-backup rules), build-backups/
+  (all waybar snapshots moved from ~/opencode/build-backups, live path is now
+  a symlink into the repo), opencode.jsonc, README.md. Live paths are
+  symlinks into the clone so work on any PC = clone + setup-dev.sh.
+  supra-bootstrap.day1.bak.sh now tracked. New PC flow: clone, ./dev/setup-dev.sh,
+  restart opencode; full desktop restore = ./supra-bootstrap.sh.
 - One-time root fix for Wi-Fi picker prepared: ~/.local/bin/supra-wifi-fix.sh
   (adds ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel + update_config=1,
   restarts wpa_supplicant) — user must run `su -c ~/.local/bin/supra-wifi-fix.sh` once

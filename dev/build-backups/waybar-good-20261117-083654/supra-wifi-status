@@ -1,0 +1,78 @@
+#!/bin/sh
+# SupraOS wifi bars module: bars + hover list of networks
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+IFACE=wlan0
+D=$HOME/.cache/supra-wifi
+mkdir -p "$D"
+B1=$(printf '\342\226\202'); B2=$(printf '\342\226\204'); B3=$(printf '\342\226\206'); B4=$(printf '\342\226\210')
+DIM=$(printf "<span color='#3a3a3a'>")
+CLOSE='</span>'
+
+esc() { printf '%s' "$1" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'; }
+
+line=$(awk -v i="$IFACE:" '$1==i' /proc/net/wireless 2>/dev/null)
+connected="no"
+essid=""
+level="-100"
+if [ -n "$line" ]; then
+  level=$(printf '%s' "$line" | awk '{gsub(/[.]/,"",$4); print $4}')
+  level=${level:--100}
+  essid=$(wpa_cli -i "$IFACE" status 2>/dev/null | awk -F= '/^ssid=/{print $2}' | tr -d '"')
+  [ -n "$essid" ] && connected="yes"
+fi
+
+if   [ "$level" -ge -55 ]; then n=4
+elif [ "$level" -ge -67 ]; then n=3
+elif [ "$level" -ge -72 ]; then n=2
+elif [ "$level" -ge -80 ]; then n=1
+else n=1
+fi
+
+bars=""
+i=1
+for b in "$B1" "$B2" "$B3" "$B4"; do
+  if [ "$connected" = "yes" ] && [ "$i" -le "$n" ]; then
+    bars="$bars$b"
+  else
+    bars="$bars$DIM$b$CLOSE"
+  fi
+  i=$(( i + 1 ))
+done
+
+# tooltip list of networks (strongest first)
+idx=$(cat "$D/idx" 2>/dev/null)
+idx=${idx:-1}
+tip="<tt>"
+n=1
+if [ -s "$D/networks" ]; then
+  while IFS="$(printf '\t')" read -r ssid flags sig; do
+    [ -z "$ssid" ] && continue
+    if   [ "$sig" -ge 145 ]; then k=4
+    elif [ "$sig" -ge 133 ]; then k=3
+    elif [ "$sig" -ge 128 ]; then k=2
+    elif [ "$sig" -ge 120 ]; then k=1
+    else k=1
+    fi
+    mb=""
+    j=1
+    for b in "$B1" "$B2" "$B3" "$B4"; do
+      if [ "$j" -le "$k" ]; then mb="$mb$b"; else mb="$mb$DIM$b$CLOSE"; fi
+      j=$(( j + 1 ))
+    done
+    name=$(esc "$ssid")
+    star=""
+    [ "$ssid" = "$essid" ] && star=" \342\234\223"
+    if [ "$n" = "$idx" ]; then
+      tip="$tip<span background='#e8e6df' foreground='#000000'> $mb $name$star </span>
+"
+    else
+      tip="$tip $mb $name$star
+"
+    fi
+    n=$(( n + 1 ))
+  done < "$D/networks"
+fi
+tip="$tip</tt>"
+
+TIP=$(printf '%b' "$tip" | awk '{if(NR>1) printf "\\n"; printf "%s", $0}')
+printf '{"text": "%s", "tooltip": "%s", "class": "wifi"}\n' "$bars" "$TIP"
