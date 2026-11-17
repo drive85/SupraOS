@@ -27,6 +27,49 @@ base64 tarball payload that self-extracts desktop configs into `~/`.
 - 2px pixel borders, radius 0, gaps 0, solid color wallpaper
 - DejaVu Sans Mono 10 everywhere (foot, fuzzel, mako, waybar, sway)
 
+## Session log — top bar mod (Nov 17 2026)
+
+DONE (live on machine, NOT yet pushed to repo — push at end of session):
+- Waybar icons: Font Awesome 7 glyphs on clock/wifi/battery, FA7 added to
+  font-family in style.css, monochrome theme kept
+- Clock hover: themed calendar tooltip (black box, 2px off-white border),
+  CSS margin-top 28px to pop it below the bar
+- Battery click: info popup (%, state, V/A/W, AC status, cycle count)
+  via ~/.local/bin/supra-battery-info
+- Wi-Fi click: network picker via fuzzel + wpa_cli
+  (~/.local/bin/supra-wifi-picker): scan, connect to saved, PSK prompt for new,
+  open-network support, save_config persistence
+- Battery low-battery alert: red text below 25%, blinking below 12% (charging exempt)
+- Wi-Fi module rebuilt as custom/wifi (~/.local/bin/supra-wifi-status, 5s poll):
+  phone-style signal bars ▂▄▆█ from /proc/net/wireless dBm (-55/-67/-72/-80
+  thresholds), dim ghost bars via pango spans, percentage kept, tooltip shows
+  essid/ip/dBm, click still opens the picker. Old network module removed.
+- Wi-Fi final (reverted after drawer + fzf-popup experiments, both scrapped:
+  drawer expanded horizontally off the 1366px screen; fzf popup too buggy):
+  hover bars = tooltip list of networks (<tt>, bars glyphs, connected = check,
+  scroll = move inverted selection row via ~/.cache/supra-wifi/idx, click =
+  supra-wifi-connect (saved=select, new=fuzzel password box, open=NONE),
+  right-click = supra-wifi-rescan (cache ~/.cache/supra-wifi/networks, 180s
+  auto-refresh). supra-wifi-status/scroll/connect/rescan; picker + row + menu
+  deleted. GTK tooltips can't be hovered = hard limit, do not retry.
+- State saved locally (Nov 17 2026, approved by user): bootstrap payload
+  rebuilt from live home — includes the good wifi flow (waybar config+style)
+  AND ~/.local/bin supra-* scripts (wifi-status/scroll/connect/rescan,
+  battery-info, wifi-fix.sh) so restores are complete. Roundtrip verified
+  (extract == staging). fzf NOT in payload/list (experiment scrapped).
+  Known-good snapshot: ~/opencode/build-backups/waybar-good-*. Not committed
+  or pushed yet — user said save locally only.
+- One-time root fix for Wi-Fi picker prepared: ~/.local/bin/supra-wifi-fix.sh
+  (adds ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel + update_config=1,
+  restarts wpa_supplicant) — user must run `su -c ~/.local/bin/supra-wifi-fix.sh` once
+- Clock click terminal popup: implemented, then REMOVED (redundant with hover
+  tooltip + buggy) — hover tooltip is the final calendar UX
+- Centered-calendar experiment (full-width tooltip clamp + foot popup) REVERTED
+  Nov 17: tooltip position is GTK cursor-anchored, not pinnable. Final state =
+  themed hover tooltip tight under the bar (no margin), no clock click handler,
+  supra-calendar script deleted. Backups: build-backups/waybar-good-20261117-070546
+- Backup: ~/opencode/build-backups/waybar-20261117-064751/ (pre-mod config + restore.sh)
+
 ## Foolproof audit (Nov 16 2026)
 
 Verified:
