@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.jpg" alt="SupraOS logo" width="320">
+</p>
+
 # SupraOS
 
 A minimal Alpine Linux desktop mod, inspired by [Omarchy](https://github.com/basecamp/omarchy)
