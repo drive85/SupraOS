@@ -93,18 +93,45 @@ great templates to steal from):
 
 - `supra-bootstrap.sh` — the whole OS restore: package list + services + embedded
   base64 tarball of every config
+- `dev/` — the AI-assisted dev environment (skill, build-backups, one-shot setup)
 - `NOTES.md` — working notes: audit results, decisions, pending ideas
 - `AGENTS.md` — instructions for AI assistants working on this repo
 
-## Known quirks / roadmap
+## Dev environment (opencode)
+
+Work on SupraOS from any PC, one shot:
+
+```sh
+git clone https://github.com/drive85/SupraOS.git && cd SupraOS
+./dev/setup-dev.sh   # links the opencode skill + backups into live paths
+```
+
+Live paths are symlinks into the clone, so new backups and skill edits land in
+the repo and travel with the next push. Details in `dev/README.md`.
+
+## Roadmap
+
+Updated dynamically as work lands.
+
+| Feature | Progress |
+|---------|----------|
+| Bootstrap/restore — one script, whole OS | 100% |
+| Top bar — battery, calendar, FA7 icons, wifi flow (hover list, scroll select, click connect) | 100% |
+| Wifi menu — hoverable menu under the bar with the live network list | 30% |
+| Audio — pipewire/wireplumber, working volume keys and sound | 0% |
+| Screen lock — swaylock/swayidle + keybind | 0% |
+| Setup menu — real entries (or removal of the dead ones) | 0% |
+| keyd — real keymap or remove the placeholder | 0% |
+| Personal-data restore — Firefox profile, wpa PSKs helper | 0% |
+
+## Known quirks
 
 Honest list (kept in `NOTES.md` with full detail):
 
 - Volume keys are wired to `wpctl` but pipewire/wireplumber isn't installed yet,
-  so they do nothing (and there's no sound). Planned.
+  so they do nothing (and there's no sound).
 - "Setup" menu's Wi-Fi (nmtui) and Audio Mixer (alsamixer) entries need packages
   that aren't installed yet, so they fail when clicked. Intentional for now.
-- No screen locker yet (swaylock/swayidle would be nice).
 - keyd runs with an empty config — placeholder for future remaps.
 - The bootstrap restores configs and packages, but not personal data: Firefox
   profile, Wi-Fi passwords, and (optionally-installed) OpenCode binary are yours

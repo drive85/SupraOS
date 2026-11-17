@@ -71,3 +71,8 @@ recent-files. Root-side state (Wi-Fi PSKs, hostname, timezone) is not captured.
 - No screen locker (swaylock/swayidle) yet.
 - keyd service runs with an empty config as a placeholder.
 - See `NOTES.md` for the full audit history and decisions.
+
+## Roadmap upkeep
+
+- Keep the README.md Roadmap table current: update percentages and add/remove
+  features in the same session as the work that changes them.
