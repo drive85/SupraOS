@@ -1,0 +1,49 @@
+#!/bin/sh
+# SupraOS wifi connect: connect to the network selected by scrolling
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+D=$HOME/.cache/supra-wifi
+mkdir -p "$D"
+IFACE=wlan0
+W="wpa_cli -i $IFACE"
+
+[ -s "$D/networks" ] || { setsid ~/.local/bin/supra-wifi-rescan >/dev/null 2>&1 & exit 0; }
+
+idx=$(cat "$D/idx" 2>/dev/null)
+idx=${idx:-1}
+entry=$(sed -n "${idx}p" "$D/networks")
+[ -z "$entry" ] && exit 0
+ssid=$(printf '%s' "$entry" | cut -f1)
+flags=$(printf '%s' "$entry" | cut -f2)
+
+current=$($W status 2>/dev/null | awk -F= '/^ssid=/{print $2}')
+[ "$ssid" = "$current" ] && exit 0
+
+id=$($W list_networks 2>/dev/null | awk -F'\t' -v s="$ssid" '$2==s{print $1; exit}')
+
+if [ -n "$id" ]; then
+  $W select_network "$id" >/dev/null 2>&1
+else
+  case "$flags" in
+    *WPA*|*RSN*|*WEP*)
+      psk=$(fuzzel --dmenu --password --prompt="PSK for $ssid: ")
+      ;;
+    *)
+      psk=""
+      ;;
+  esac
+  newid=$($W add_network 2>/dev/null | tr -d '"')
+  [ -z "$newid" ] && exit 0
+  $W set_network "$newid" ssid "\"$ssid\"" >/dev/null 2>&1
+  if [ -n "$psk" ]; then
+    $W set_network "$newid" psk "\"$psk\"" >/dev/null 2>&1
+  elif printf '%s' "$flags" | grep -q 'WPA\|RSN\|WEP'; then
+    $W remove_network "$newid" >/dev/null 2>&1
+    exit 0
+  else
+    $W set_network "$newid" key_mgmt NONE >/dev/null 2>&1
+  fi
+  $W select_network "$newid" >/dev/null 2>&1
+  $W save_config >/dev/null 2>&1
+fi
+
+setsid ~/.local/bin/supra-wifi-rescan >/dev/null 2>&1 &

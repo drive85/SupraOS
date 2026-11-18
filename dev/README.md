@@ -21,6 +21,10 @@ opencode                  # restart it so the skill loads
 - `build-backups/` — pre-modification snapshots of live configs, each with a
   `restore.sh` to roll back. Naming: `<element>-<timestamp>` (snapshot before
   changes) and `<element>-good-<timestamp>` (approved known-good state).
+- `wifi-app/` — source and `build.sh` for the bar's wifi popup (GTK3 +
+  gtk-layer-shell). Build deps are one-time: `su -c
+  ~/.local/bin/supra-dev-deps.sh` (script ships in the payload), then
+  `./dev/wifi-app/build.sh` installs the binary into `~/.local/bin`.
 - `opencode.jsonc` — global opencode config (currently just `$schema`).
 
 ## Conventions

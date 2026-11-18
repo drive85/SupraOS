@@ -67,6 +67,41 @@ DONE (live on machine, NOT yet pushed to repo — push at end of session):
   symlinks into the clone so work on any PC = clone + setup-dev.sh.
   supra-bootstrap.day1.bak.sh now tracked. New PC flow: clone, ./dev/setup-dev.sh,
   restart opencode; full desktop restore = ./supra-bootstrap.sh.
+- Wi-Fi popup app (Nov 17 2026, chosen over nm-applet/NM stack and over static
+  waybar menus): dev/wifi-app/wifi-app.c — GTK3 + gtk-layer-shell layer window
+  anchored under the bars top-right (runtime lib already present via waybar;
+  one-time build deps via ~/.local/bin/supra-dev-deps.sh). Styled like the clock
+  tooltip: black, 2px #e8e6df frame, invert-on-hover rows, 12px mono. Connected
+  network pinned first, then strongest-to-weakest. Click/Enter on a row = the
+  network's action: connected → info view (ip/freq/signal + back/disconnect),
+  saved/open → connect, locked new → inline PSK entry ("Password" placeholder).
+  No bottom buttons; ESC closes. Bar module on-click runs supra-wifi-toggle
+  (pidfile ~/.cache/supra-wifi/app.pid). Click-outside dismisses: a transparent
+  fullscreen TOP-layer backdrop window sits under the popup (OVERLAY layer) and
+  quits on any button press — Wayland gives layer surfaces no pointer grab, so
+  this is the standard menu trick; the dismiss click is swallowed (menu-like).
+  List caps at 8 rows (22px each) and scrolls beyond. Hover cannot open the app: waybar
+  custom modules have no on-hover event (checked v0.15.0 binary) — its only
+  hover surface was the GTK tooltip, now removed from the status script.
+- GTK/layer-shell layout gotchas (Nov 18 2026): a `border` on the `window` CSS
+  node is not painted on layer-shell windows — draw it on an inner box (set a
+  widget name, style #frame). Layer TOP surfaces are placed inside the top
+  layer's exclusive zone in sway, so gtk-layer-shell margin-top stacks on the
+  bar height (margin 4 → 4px visual gap under the 30px bar). View switches
+  (list/psk/info) need gtk_window_resize(win, 1, 1) or GTK keeps the old
+  configure size. GTK3 has no gtk_list_box_append — use insert(..., -1).
+- BusyBox pgrep/pkill (Alpine default) match the full argv[0] with -x, so
+  `pkill -x supra-wifi-app` never matches — use pidfiles (or plain substring
+  pkill, which also matches the invoking shell: avoid). `pkill -ef` kills the
+  calling shell too.
+- Brightness persistence (Nov 17 2026): brightnessctl's own -s/-r useless here —
+  it saves the PREVIOUS state and stores it in /tmp (tmpfs, dies at reboot).
+  So: sway brightness binds now append `&& brightnessctl get >
+  ~/.cache/supra-brightness` (saves latest absolute level), and
+  /etc/local.d/brightness.start (root, one-time install via
+  ~/.local/bin/supra-brightness-fix.sh, `rc-update add local default`) restores
+  it clamped to max on boot. Also baked into the bootstrap su block
+  (TARGET_USER interpolated). Tested: save 60% -> set 10% -> restore = 60%.
 - One-time root fix for Wi-Fi picker prepared: ~/.local/bin/supra-wifi-fix.sh
   (adds ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel + update_config=1,
   restarts wpa_supplicant) — user must run `su -c ~/.local/bin/supra-wifi-fix.sh` once

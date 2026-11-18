@@ -54,8 +54,14 @@ What the script does:
 4. Adds your user to the seat/video/input/audio groups
 5. Extracts every config file into your home directory
 
-Wi-Fi is configured via `wpa_supplicant` (edit `/etc/wpa_supplicant/wpa_supplicant.conf`
-as root). Timezone/hostname/keymap come from your `setup-alpine` answers.
+Wi-Fi: click the network icon in the bar. A popup opens under it with the live
+list — connected network first, then strongest to weakest, 8 rows tall and
+scrollable after that. Click or Enter a network to connect (inline password
+when it's a new locked one); click the connected network for its ip, frequency
+and signal, with a disconnect button. Click anywhere outside or press Esc to
+close. Underlying config lives in `wpa_supplicant` (edit
+`/etc/wpa_supplicant/wpa_supplicant.conf` as root). Timezone/hostname/keymap
+come from your `setup-alpine` answers.
 
 ## Keybinds
 
@@ -93,7 +99,7 @@ great templates to steal from):
 
 - `supra-bootstrap.sh` — the whole OS restore: package list + services + embedded
   base64 tarball of every config
-- `dev/` — the AI-assisted dev environment (skill, build-backups, one-shot setup)
+- `dev/` — dev environment (skill, build-backups, one-shot setup) and `wifi-app/`, the wifi popup source
 - `NOTES.md` — working notes: audit results, decisions, pending ideas
 - `AGENTS.md` — instructions for AI assistants working on this repo
 
@@ -116,8 +122,8 @@ Updated dynamically as work lands.
 | Feature | Progress |
 |---------|----------|
 | Bootstrap/restore — one script, whole OS | 100% |
-| Top bar — battery, calendar, FA7 icons, wifi flow (hover list, scroll select, click connect) | 100% |
-| Wifi menu — hoverable menu under the bar with the live network list | 30% |
+| Top bar — battery, calendar, FA7 icons, wifi module | 100% |
+| Wifi popup — click bars, gtk-layer-shell app: live list, 8 rows, inline PSK, info view, click-outside/ESC | 100% |
 | Audio — pipewire/wireplumber, working volume keys and sound | 0% |
 | Screen lock — swaylock/swayidle + keybind | 0% |
 | Setup menu — real entries (or removal of the dead ones) | 0% |
@@ -133,6 +139,8 @@ Honest list (kept in `NOTES.md` with full detail):
 - "Setup" menu's Wi-Fi (nmtui) and Audio Mixer (alsamixer) entries need packages
   that aren't installed yet, so they fail when clicked. Intentional for now.
 - keyd runs with an empty config — placeholder for future remaps.
+- The wifi popup opens on click only: waybar custom modules have no hover
+  event. The click that dismisses it is swallowed, like any popup menu.
 - The bootstrap restores configs and packages, but not personal data: Firefox
   profile, Wi-Fi passwords, and (optionally-installed) OpenCode binary are yours
   to bring back.

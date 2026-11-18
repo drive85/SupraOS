@@ -1,0 +1,19 @@
+#!/bin/sh
+# SupraOS battery info popup
+b=/sys/class/power_supply/BAT0
+a=/sys/class/power_supply/AC
+cap=$(awk -F= '$1=="POWER_SUPPLY_CAPACITY"{print $2}' $b/uevent 2>/dev/null)
+sta=$(awk -F= '$1=="POWER_SUPPLY_STATUS"{print $2}' $b/uevent 2>/dev/null)
+vol=$(awk -F= '$1=="POWER_SUPPLY_VOLTAGE_NOW"{print $2}' $b/uevent 2>/dev/null)
+cur=$(awk -F= '$1=="POWER_SUPPLY_CURRENT_NOW"{print $2}' $b/uevent 2>/dev/null)
+cyc=$(awk -F= '$1=="POWER_SUPPLY_CYCLE_COUNT"{print $2}' $b/uevent 2>/dev/null)
+onl=$(cat $a/online 2>/dev/null)
+echo "Battery: ${cap:-?}%  (${sta:-unknown})"
+awk -v v="$vol" -v i="$cur" 'BEGIN{
+  if (v != "") printf "Voltage: %.2f V\n", v/1e6
+  if (i != "") printf "Current: %.2f A\n", i/1e6
+  if (v != "" && i != "") printf "Power:   %.2f W\n", v*i/1e12 }'
+[ "$onl" = "1" ] && echo "AC: plugged in" || echo "AC: on battery"
+[ -n "$cyc" ] && [ "$cyc" != "0" ] && echo "Cycles: $cyc"
+printf '\n[Enter to close] '
+read x
