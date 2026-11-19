@@ -62,14 +62,18 @@ Deliberately NOT in the tarball (volatile or personal): `~/.config/mozilla`
 (Firefox profile), `~/.config/opencode` except `opencode.jsonc`, gvfs metadata,
 recent-files. Root-side state (Wi-Fi PSKs, hostname, timezone) is not captured.
 
-## Known quirks (intentional as of Nov 2026)
+## Current state (Nov 2026)
 
-- Volume keybinds call `wpctl` but pipewire/wireplumber is not installed — the
-  keys do nothing and there is no sound yet.
-- The "Setup" menu entries for nmtui (Wi-Fi) and alsamixer (audio) fail because
-  those packages are not installed.
-- No screen locker (swaylock/swayidle) yet.
-- keyd service runs with an empty config as a placeholder.
+- Audio works: PipeWire/WirePlumber, volume keys via `wpctl` (capped at 100%).
+- Wi-Fi is plain `wpa_supplicant` + shell scripts (no NetworkManager).
+- keyd owns the Chromebook top row and the ACPI power button (`power = f13`).
+- Power button opens `~/.local/bin/supra-power-menu`; lid close locks; elogind
+  ignores power/lid (see NOTES.md).
+- Lock screen is `~/.local/bin/supra-lock` (patched gtklock 4.0.0), Super+L.
+  It needs the runtime package `linux-pam` (in the bootstrap apk list).
+- Build toolchain (gcc, meson, ninja, -dev headers) is NOT installed by
+  default to keep the PC lean: `su -c ./dev/deps.sh` before rebuilds.
+- acpid is not used: the power button goes through keyd, so no acpid service.
 - See `NOTES.md` for the full audit history and decisions.
 
 ## Roadmap upkeep

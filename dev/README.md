@@ -21,9 +21,11 @@ opencode                  # restart it so the skill loads
 - `build-backups/` — pre-modification snapshots of live configs, each with a
   `restore.sh` to roll back. Naming: `<element>-<timestamp>` (snapshot before
   changes) and `<element>-good-<timestamp>` (approved known-good state).
+- `deps.sh` — installs the build toolchain for both apps (gcc, meson, ninja,
+  -dev headers). Not part of the runtime payload: run `su -c ./dev/deps.sh` only
+  when rebuilding, then `apk del` the toolchain again to keep the PC lean.
 - `wifi-app/` — source and `build.sh` for the bar's wifi popup (GTK3 +
-  gtk-layer-shell). Build deps are one-time: `su -c
-  ~/.local/bin/supra-dev-deps.sh` (script ships in the payload), then
+  gtk-layer-shell). After `./dev/deps.sh`:
   `./dev/wifi-app/build.sh` installs the binary into `~/.local/bin`.
 - `lock-app/` — patched gtklock 4.0.0 + static gtk-session-lock, with both
   upstream tarballs vendored (GPL compliance for the payload binary). `./build.sh`

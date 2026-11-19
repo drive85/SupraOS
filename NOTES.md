@@ -303,3 +303,26 @@ Not restorable by this script (by design / needs separate decision):
 - gtklock config no longer hardcodes `style=/home/erick/...`; upstream falls
   back to the XDG path `~/.config/gtklock/style.css`.
 - Dropped `supra-bootstrap.day1.bak.sh` from the repo (git history keeps it).
+
+## Graphical login via lock screen (Nov 19 2026)
+
+- Black screen after kernel: getty on tty1 was invisible after framebuffer switch.
+  Fixed by removing the text login and turning the existing lock screen into the
+  graphical login.
+- `/etc/inittab` tty1 changed to `su -l erick` autologin.
+  Sway starts from `~/.profile`, then `exec ~/.local/bin/supra-lock` runs
+  immediately via sway config. User sees the same gtklock UI as Super+L.
+- GUI unchanged: black background, DejaVu Sans Mono, 2px border, start-hidden
+  box, hold-eye reveal. Authentication is PAM `pam_unix` for user erick.
+- Backup created before change: `~/opencode/build-backups/inittab-sway-20261119-100116/`
+- `supra-bootstrap.sh` payload refreshed to include updated `~/.config/sway/config`.
+
+## Debloat tooling (Nov 19 2026)
+
+- Added `dev/debloat.sh` + `~/.local/bin/supra-debloat` symlink.
+- Flags: system/dev/repo/all. Safe, backup-first, minimal cleanup for Chromebook 12.
+- System: apk cache clean, /tmp trim, log/journal rotation via su.
+- Dev: prune build-backups >7d keeping last 3, safe user cache prune keeping supra-*.
+- Repo: list >50M files, remove junk, git gc.
+- Docs in `dev/DEBLOAT.md`. Intent: run after long sessions or on "debloat" request.
+
