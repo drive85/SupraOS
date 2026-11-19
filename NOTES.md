@@ -2,6 +2,15 @@
 
 Reviewed: Nov 16 2026 (day 1 build, running on Dell Chromebook 12)
 
+## Sway config warning fixed (Nov 18 2026)
+
+- The bar showed "There are errors in your config file": Mod4+l was bound twice.
+  The vim focus variables set $right=l, so `$mod+$right focus right` collided
+  with the new `$mod+l` lock. `sway -C` does not flag duplicate binds — only the
+  runtime reload does. Fix: vim "right" focus moved to `$mod+semicolon`
+  (Super+HJ K; on this layout); arrows unchanged. Verified with a bar
+  screenshot after `swaymsg reload` (banner gone).
+
 ## Lockscreen (Nov 18 2026)
 
 - swaylock was replaced: its only indicator is the ring ("round colored thing"),
@@ -255,7 +264,7 @@ Not restorable by this script (by design / needs separate decision):
 - Super+Return: foot | Super+Space: fuzzel | Super+W: kill | Super+F: fullscreen
 - Super+B: firefox | Super+E: pcmanfm | Super+S/Shift+S: grim+slurp screenshot + wl-copy
 - Alt+Tab / Alt+Shift+Tab: focus cycle
-- Super+HJKL / arrows: focus, +Shift: move, Super+V: splitv
+- Super+HJ K; / arrows: focus, +Shift: move, Super+V: splitv (right uses ; since Super+L locks)
 - Workspaces 1-9, move with Shift
 - XF86 keys: volume (wpctl — nonfunctional, see #2), brightness (brightnessctl)
 

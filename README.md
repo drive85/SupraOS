@@ -82,7 +82,7 @@ cutting power.
 | Super+E           | pcmanfm                         |
 | Super+W           | close window                    |
 | Super+F           | fullscreen                      |
-| Super+Arrows      | focus (vim keys not bound)      |
+| Super+Arrows/HJ K; | focus (right is ; since L locks) |
 | Super+Shift+Arrows| move window                     |
 | Super+1..9        | workspaces                      |
 | Super+Shift+1..9  | send window to workspace        |
