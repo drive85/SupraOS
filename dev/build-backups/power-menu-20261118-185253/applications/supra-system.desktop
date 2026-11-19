@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=System
+GenericName=Reload, Logout, Reboot & Shutdown
+Exec=sh -c 'c=$(printf "Reload Sway\nLogout\nReboot\nShutdown" | fuzzel --dmenu --prompt="> " --lines=6); case "$c" in "Reload Sway") swaymsg reload;; "Logout") swaymsg exit;; "Reboot") su -c "reboot";; "Shutdown") su -c "poweroff";; esac'

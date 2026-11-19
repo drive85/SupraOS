@@ -86,6 +86,7 @@ come from your `setup-alpine` answers.
 | XF86 brightness   | brightness up/down              |
 | XF86 volume       | volume up/down/mute (shown in bar) |
 | Super+Escape      | lock screen                   |
+| Power button      | power menu (lock/suspend/…)   |
 
 ## The Supra menus
 
@@ -93,8 +94,8 @@ Fuzzel also lists these desktop entries (they are plain shell one-liners,
 great templates to steal from):
 
 - **Trigger** — screenshot region/fullscreen, keybinding cheat-sheet
-- **Setup** — Wi-Fi, audio mixer, edit sway/waybar/fuzzel config
-- **System** — reload sway, logout, reboot, shutdown
+- **Setup** — audio mixer, edit sway/waybar/fuzzel config
+- **Power** — lock, suspend, logout, reboot, shutdown (also the power button)
 - **Update** — `apk upgrade` everything
 - **About** — system info summary
 
@@ -128,21 +129,18 @@ Updated dynamically as work lands.
 | Top bar — battery, calendar, FA7 icons, wifi module | 100% |
 | Wifi popup — click bars, gtk-layer-shell app: live list, 8 rows, inline PSK, info view, click-outside/ESC | 100% |
 | Audio — pipewire/wireplumber, working volume keys and sound | 100% |
-| Screen lock — swaylock/swayidle + keybind | 100% |
-| Setup menu — real entries (or removal of the dead ones) | 0% |
-| keyd — real keymap or remove the placeholder | 0% |
-| Personal-data restore — Firefox profile, wpa PSKs helper | 0% |
+| Screen lock — swaylock/swayidle, keybind, lid closes lock | 100% |
+| Power menu — power button opens lock/suspend/logout/reboot/shutdown | 100% |
+| Setup menu — working entries only (dead Wi-Fi entry removed) | 100% |
+| keyd — Chromebook top-row remap (brightness/volume/media) | 100% |
 
 ## Known quirks
 
 Honest list (kept in `NOTES.md` with full detail):
 
-- "Setup" menu's Wi-Fi entry still calls `nmtui` (NetworkManager isn't
-  installed) — use the bar's wifi popup instead; removal is on the roadmap.
 - No volume/brightness OSD overlay: feedback is live in the bar (volume and
   backlight modules). SwayOSD was rejected as a Rust/GTK4 daemon on this
   hardware.
-- keyd runs with an empty config — placeholder for future remaps.
 - The wifi popup opens on click only: waybar custom modules have no hover
   event. The click that dismisses it is swallowed, like any popup menu.
 - The bootstrap restores configs and packages, but not personal data: Firefox

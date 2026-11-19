@@ -2,6 +2,35 @@
 
 Reviewed: Nov 16 2026 (day 1 build, running on Dell Chromebook 12)
 
+## Power menu, keyd, cleanup (Nov 18 2026)
+
+- Power button on this Chromebook is an ACPI "Power Button" input device
+  (LNXPWRBN), not a key on the keyboard matrix. libinput/compositors ignore
+  pure power-button devices, elogind only watches it, and Alpine's BusyBox
+  acpid listens to the long-gone /proc/acpi/event — so the button did nothing.
+  Fix: keyd now owns that device too (`k:0000:0001`) and maps `power = f13`;
+  sway binds F13 and XF86PowerOff to `~/.local/bin/supra-power-menu`.
+  Long-press still hard-cuts power at the EC level. HandlePowerKey=ignore and
+  HandleLidSwitch*=ignore in /etc/elogind/logind.conf so elogind never steals
+  the button or fights the lid bind. Lid close locks via `bindswitch lid:on`.
+- Power menu (fuzzel dmenu): Lock, Suspend, Logout, Reboot, Shutdown.
+  Actions needing root go through /usr/local/bin/supra-session-action (fixed
+  whitelist: suspend/reboot/poweroff) with a doas nopass rule. doas quirk:
+  rules in /etc/doas.d are evaluated so the *last* matching rule wins, so the
+  rule lives in 99-supra-session.conf (20-wheel.conf would otherwise win and
+  ask for a password); `doas -n` skips the tty requirement fuzzel can't give.
+- Cleanup: "Setup" menu lost its dead Wi-Fi (nmtui) entry; System menu became
+  "Power" and launches the power menu; `supra-wifi-fix.sh` deleted — bootstrap
+  now sets wpa_supplicant `ctrl_interface=...GROUP=wheel` and `update_config=1`
+  itself. Bootstrap also ships the real keyd cros.conf (it used to write an
+  empty placeholder) and the session-action helper + doas/logind tweaks.
+- keyd is not a placeholder: /etc/keyd/cros.conf remaps the Chromebook top row
+  (f6/f7 brightness, f9/f10 volume, f8 mute, f4 f11, etc.) for the internal
+  keyboard IDs.
+- Brightness keeps landing on 5%: the keys save to ~/.cache/supra-brightness
+  on every press, so a held/accidental brightness-down at the top row makes
+  the next boot dim too. Reset with brightnessctl set 60% and update the cache.
+
 ## Audio, lock/idle, OSD (Nov 18 2026)
 
 - Audio = stock PipeWire + WirePlumber + pipewire-pulse + ALSA utils, same

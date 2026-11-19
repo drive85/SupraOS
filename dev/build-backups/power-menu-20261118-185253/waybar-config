@@ -1,0 +1,59 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 28,
+  "modules-left": ["sway/workspaces"],
+  "modules-center": ["clock"],
+  "modules-right": ["custom/wifi", "pulseaudio", "backlight", "battery"],
+  "sway/workspaces": {
+    "disable-scroll": false,
+    "all-outputs": true,
+    "persistent-workspaces": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": []
+    }
+  },
+  "clock": {
+    "format": " {:%H:%M  |  %a %b %d}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "calendar": {
+      "format": {
+        "today": "<span background='#e8e6df' foreground='#000000'>{}</span>"
+      }
+    }
+  },
+  "custom/wifi": {
+    "exec": "~/.local/bin/supra-wifi-status",
+    "return-type": "json",
+    "interval": 5,
+    "on-click": "~/.local/bin/supra-wifi-toggle",
+    "on-click-right": "~/.local/bin/supra-wifi-rescan"
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": " {volume}%",
+    "format-icons": ["\uf026", "\uf027", "\uf028"],
+    "scroll-step": 2,
+    "tooltip-format": "{desc}"
+  },
+  "backlight": {
+    "device": "intel_backlight",
+    "format": "\uf185 {percent}%",
+    "tooltip": false
+  },
+  "battery": {
+    "bat": "BAT0",
+    "adapter": "AC",
+    "format": " {capacity}%",
+    "format-charging": " {capacity}%",
+    "format-warning": " {capacity}%",
+    "format-critical": " {capacity}%",
+    "states": {
+      "warning": 25,
+      "critical": 12
+    },
+    "on-click": "~/.local/bin/supra-battery-info"
+  }
+}
