@@ -355,3 +355,10 @@ Text editor:
 - `neovim` much larger.
 Recommendation: `nano` as default minimal editor.
 
+## Media & editor implemented (Nov 19 2026)
+
+- Added `imv`, `mpv`, `nano` to `supra-bootstrap.sh` apk list.
+- Packages install on fresh restore; payload refreshed accordingly.
+- Minimal desktop entries to be added later for fuzzel integration.
+- Roadmap updated: Image/Video viewer and Text editor moved from 0% to 100% pending final UX testing.
+
