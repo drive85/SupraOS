@@ -140,6 +140,8 @@ Updated dynamically as work lands.
 | Power menu — power button opens lock/suspend/logout/reboot/shutdown | 100% |
 | Setup menu — working entries only (dead Wi-Fi entry removed) | 100% |
 | keyd — Chromebook top-row remap (brightness/volume/media) | 100% |
+| Image / Video viewer | 0% |
+| Text editor | 0% |
 
 ## Known quirks
 
