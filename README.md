@@ -30,7 +30,9 @@ One script, one tarball, one monochrome theme.
 | File manager  | pcmanfm   |
 | Browser       | Firefox   |
 | Screenshots   | grim + slurp + wl-copy |
+| Audio         | PipeWire + WirePlumber |
 | Brightness    | brightnessctl |
+| Lock / idle   | swaylock + swayidle |
 | Services      | OpenRC + seatd + elogind + dbus |
 
 ## Install
@@ -82,7 +84,8 @@ come from your `setup-alpine` answers.
 | Super+S           | screenshot region (copies it)   |
 | Super+Shift+S     | screenshot full screen          |
 | XF86 brightness   | brightness up/down              |
-| XF86 volume       | volume (see known quirks)       |
+| XF86 volume       | volume up/down/mute (shown in bar) |
+| Super+Escape      | lock screen                   |
 
 ## The Supra menus
 
@@ -124,8 +127,8 @@ Updated dynamically as work lands.
 | Bootstrap/restore — one script, whole OS | 100% |
 | Top bar — battery, calendar, FA7 icons, wifi module | 100% |
 | Wifi popup — click bars, gtk-layer-shell app: live list, 8 rows, inline PSK, info view, click-outside/ESC | 100% |
-| Audio — pipewire/wireplumber, working volume keys and sound | 0% |
-| Screen lock — swaylock/swayidle + keybind | 0% |
+| Audio — pipewire/wireplumber, working volume keys and sound | 100% |
+| Screen lock — swaylock/swayidle + keybind | 100% |
 | Setup menu — real entries (or removal of the dead ones) | 0% |
 | keyd — real keymap or remove the placeholder | 0% |
 | Personal-data restore — Firefox profile, wpa PSKs helper | 0% |
@@ -134,10 +137,11 @@ Updated dynamically as work lands.
 
 Honest list (kept in `NOTES.md` with full detail):
 
-- Volume keys are wired to `wpctl` but pipewire/wireplumber isn't installed yet,
-  so they do nothing (and there's no sound).
-- "Setup" menu's Wi-Fi (nmtui) and Audio Mixer (alsamixer) entries need packages
-  that aren't installed yet, so they fail when clicked. Intentional for now.
+- "Setup" menu's Wi-Fi entry still calls `nmtui` (NetworkManager isn't
+  installed) — use the bar's wifi popup instead; removal is on the roadmap.
+- No volume/brightness OSD overlay: feedback is live in the bar (volume and
+  backlight modules). SwayOSD was rejected as a Rust/GTK4 daemon on this
+  hardware.
 - keyd runs with an empty config — placeholder for future remaps.
 - The wifi popup opens on click only: waybar custom modules have no hover
   event. The click that dismisses it is swallowed, like any popup menu.

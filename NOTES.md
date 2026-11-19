@@ -2,6 +2,36 @@
 
 Reviewed: Nov 16 2026 (day 1 build, running on Dell Chromebook 12)
 
+## Audio, lock/idle, OSD (Nov 18 2026)
+
+- Audio = stock PipeWire + WirePlumber + pipewire-pulse + ALSA utils, same
+  stack Omarchy uses (their extra sof-firmware hook is Intel-DSP only; this
+  Chromebook is chtmax98090 and already has alsa-ucm-conf). Packages added to
+  bootstrap: alsa-utils pipewire pipewire-alsa pipewire-pulse wireplumber.
+  Alpine ships no init scripts for these, so sway execs `pipewire`,
+  `pipewire-pulse`, `wireplumber` at session start (dbus session already
+  running via .profile). Works: one sink "Built-in Audio Speaker", mic source,
+  55% default; RTKit warnings are harmless (no rtkit daemon on Alpine).
+  Volume keys add `-l 1.0` so they cannot exceed 100%.
+- Lock/idle: swaylock (PAM file shipped by the package; `-f -c 000000` black)
+  + swayidle: dpms off at 5 min, lock at 10 min, lock before sleep. Bind
+  Super+Escape. Verified: dpms off/on via swaymsg, swaylock starts and is
+  killable; real lock intentionally not left on during work.
+- OSD decision: NO SwayOSD (Omarchy's choice) — Rust + GTK4 + libinput daemon
+  is wrong for a 2-core Celeron. Feedback instead comes from waybar's native
+  `pulseaudio` and `backlight` modules (event-driven, no extra processes).
+  Icons must be written as JSON `\u` escapes: literal Font Awesome PUA
+  characters get stripped when the file passes through tooling (silent blank
+  icons), so use "\uf026"/"\uf027"/"\uf028" and "\uf185".
+- Mako is NOT installed despite older notes; no notification daemon exists.
+- Nov 18 2026: machine hit a full-screen red crash (looks like an i915 GPU
+  hang — nothing in logs, no OOM). Configs survived; apps and daemons restart
+  cleanly. Unknown trigger, watch for repeats.
+- Brightness cache can drift to accidental values (found 5%/391): the keys
+  save on every press, so a few stray presses make the next boot very dim.
+  `brightnessctl set 60% && brightnessctl get > ~/.cache/supra-brightness`
+  resets it.
+
 ## What it is
 
 Alpine Linux mod inspired by Omarchy, stripped down for low-end hardware.

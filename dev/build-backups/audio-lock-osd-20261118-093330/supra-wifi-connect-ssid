@@ -1,0 +1,33 @@
+#!/bin/sh
+# SupraOS wifi connect: SSID from $SUPRA_SSID, flags from $SUPRA_FLAGS,
+# optional PSK from $SUPRA_PSK (empty + open flags = key_mgmt NONE).
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+IFACE=wlan0
+W="wpa_cli -i $IFACE"
+
+ssid="$SUPRA_SSID"
+[ -z "$ssid" ] && exit 1
+current=$($W status 2>/dev/null | awk -F= '/^ssid=/{print $2}')
+[ "$ssid" = "$current" ] && exit 0
+
+id=$($W list_networks 2>/dev/null | awk -F'\t' -v s="$ssid" '$2==s{print $1; exit}')
+if [ -n "$id" ]; then
+  $W select_network "$id" >/dev/null 2>&1
+else
+  if [ -z "$SUPRA_PSK" ] && printf '%s' "$SUPRA_FLAGS" | grep -q 'WPA\|RSN\|WEP'; then
+    exit 1
+  fi
+  newid=$($W add_network 2>/dev/null | tr -d '"')
+  [ -z "$newid" ] && exit 1
+  $W set_network "$newid" ssid "\"$ssid\"" >/dev/null 2>&1
+  if [ -n "$SUPRA_PSK" ]; then
+    $W set_network "$newid" psk "\"$SUPRA_PSK\"" >/dev/null 2>&1
+  else
+    $W set_network "$newid" key_mgmt NONE >/dev/null 2>&1
+  fi
+  $W select_network "$newid" >/dev/null 2>&1
+  $W save_config >/dev/null 2>&1
+fi
+
+setsid ~/.local/bin/supra-wifi-rescan >/dev/null 2>&1 &
+exit 0

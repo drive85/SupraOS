@@ -15,11 +15,15 @@ every SupraOS task.
 
 Before writing any functionality, look at how it is already solved:
 
-- **Omarchy is the reference project.** Check the official Omarchy repo and
-  docs (github.com/omacom_io/omarchy, omarchy.org) for how it implements the
-  same desktop element (bar modules, menus, installers, defaults). Copy its
-  approach/code freely and credit it — SupraOS is an Omarchy-inspired mod, not
-  a competitor. If Omarchy does it with an existing tool, prefer that tool.
+- **Omarchy is the reference project — for functionality and looks only.**
+  Check the official Omarchy repo and docs (github.com/basecamp/omarchy,
+  omarchy.org) for how it solves the same desktop element (bar modules, menus,
+  OSD, lock, defaults) and copy its behaviour and visual language freely and
+  credit it. But Omarchy targets robust, modern hardware; SupraOS targets a
+  2-core Celeron with 4 GB RAM. Never copy its technical stack (Hyprland,
+  Electron, Rust/GTK4 daemons, NetworkManager) just because Omarchy uses it —
+  pick the smallest thing that just works here, even if it is a different tool
+  or a 20-line script. When in doubt: fewer daemons, less memory, faster start.
 - **Upstream docs of the actual package beat memory and guesses.** Waybar,
   sway, wlroots/layer-shell, foot, fuzzel, wpa_supplicant: check the official
   man pages, wiki, and source for the EXACT installed version. Verify
@@ -35,6 +39,8 @@ Before writing any functionality, look at how it is already solved:
 
 ## 2. Minimal always
 
+- Zen minimalism: delete before adding. Every package, daemon and module must
+  earn its RAM and startup time. Fast beats pretty, working beats clever.
 - Smallest change that solves the stated problem: minimal code, minimal
   interface, minimal config, minimal dependencies. No features, options, help
   text, or polish beyond what the user asked for.
