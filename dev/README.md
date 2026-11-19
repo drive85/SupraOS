@@ -25,6 +25,10 @@ opencode                  # restart it so the skill loads
   gtk-layer-shell). Build deps are one-time: `su -c
   ~/.local/bin/supra-dev-deps.sh` (script ships in the payload), then
   `./dev/wifi-app/build.sh` installs the binary into `~/.local/bin`.
+- `lock-app/` — patched gtklock 4.0.0 + static gtk-session-lock, with both
+  upstream tarballs vendored (GPL compliance for the payload binary). `./build.sh`
+  installs `~/.local/bin/supra-lock`. The patch adds hold-to-reveal eye and
+  click-away hide; look lives in `~/.config/gtklock/`.
 - `opencode.jsonc` — global opencode config (currently just `$schema`).
 
 ## Conventions

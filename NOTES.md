@@ -2,6 +2,29 @@
 
 Reviewed: Nov 16 2026 (day 1 build, running on Dell Chromebook 12)
 
+## Lockscreen (Nov 18 2026)
+
+- swaylock was replaced: its only indicator is the ring ("round colored thing"),
+  and it cannot draw dots or an eye. New lockscreen = gtklock 4.0.0 +
+  gtk-session-lock (static), built from vendored sources in dev/lock-app/ with
+  a 3-file patch: eye is press-and-hold (release hides), clicking elsewhere
+  hides, "Password:" label and Unlock button removed, musl/-D_DEFAULT_SOURCE
+  and export_dynamic fixes. Binary in the payload (stripped, 253K); complete
+  sources kept in the repo next to it.
+- PAM: /etc/pam.d/gtklock = pam_unix auth+account (Alpine has no base-auth
+  stack; swaylock's packaged file pointed at a missing file, so neither locker
+  could actually authenticate before this). pam_unix works for a user process
+  through setgid unix_chkpwd.
+- Config: ~/.config/gtklock/{config.ini,style.css} — black, mono, 2px square
+  border, start-hidden + 15s idle hide (box only while typing), clock+date.
+- Super+L locks (was Super+Escape). Lid, 10-min idle and before-sleep all call
+  supra-lock. swaylock package and pam file removed.
+- Testing trick: wtype sends letters fine but its Return never triggers
+  GtkEntry::activate here; synthetic /dev/uinput key events (tiny C injector,
+  KEY_ENTER=28) do. Useful when a UI needs a "real" key.
+- Keyd note: reload does not pick up newly added [ids] devices — the power
+  button only started mapping to F13 after `rc-service keyd restart`.
+
 ## Power menu, keyd, cleanup (Nov 18 2026)
 
 - Power button on this Chromebook is an ACPI "Power Button" input device

@@ -32,7 +32,7 @@ One script, one tarball, one monochrome theme.
 | Screenshots   | grim + slurp + wl-copy |
 | Audio         | PipeWire + WirePlumber |
 | Brightness    | brightnessctl |
-| Lock / idle   | swaylock + swayidle |
+| Lock / idle   | gtklock (patched) + swayidle |
 | Services      | OpenRC + seatd + elogind + dbus |
 
 ## Install
@@ -65,6 +65,13 @@ close. Underlying config lives in `wpa_supplicant` (edit
 `/etc/wpa_supplicant/wpa_supplicant.conf` as root). Timezone/hostname/keymap
 come from your `setup-alpine` answers.
 
+Lockscreen: Super+L, closing the lid, 10 minutes idle or before sleep. Pure
+black with a clock and date; a single thin box appears once you start typing
+(dots for each character). Hold the eye icon to see the password, let go and
+it hides again. It is gtklock, patched for hold-to-reveal — sources and build
+steps in `dev/lock-app/`. The power button opens the power menu instead of
+cutting power.
+
 ## Keybinds
 
 | Keys              | Action                          |
@@ -75,8 +82,8 @@ come from your `setup-alpine` answers.
 | Super+E           | pcmanfm                         |
 | Super+W           | close window                    |
 | Super+F           | fullscreen                      |
-| Super+H/J/K/L     | focus (arrows also work)        |
-| Super+Shift+HJKL  | move window                     |
+| Super+Arrows      | focus (vim keys not bound)      |
+| Super+Shift+Arrows| move window                     |
 | Super+1..9        | workspaces                      |
 | Super+Shift+1..9  | send window to workspace        |
 | Super+V           | split vertically                |
@@ -85,7 +92,7 @@ come from your `setup-alpine` answers.
 | Super+Shift+S     | screenshot full screen          |
 | XF86 brightness   | brightness up/down              |
 | XF86 volume       | volume up/down/mute (shown in bar) |
-| Super+Escape      | lock screen                   |
+| Super+L           | lock screen (lockscreen)      |
 | Power button      | power menu (lock/suspend/…)   |
 
 ## The Supra menus
@@ -103,7 +110,7 @@ great templates to steal from):
 
 - `supra-bootstrap.sh` — the whole OS restore: package list + services + embedded
   base64 tarball of every config
-- `dev/` — dev environment (skill, build-backups, one-shot setup) and `wifi-app/`, the wifi popup source
+- `dev/` — dev environment (skill, build-backups, one-shot setup), plus `wifi-app/` (wifi popup) and `lock-app/` (patched gtklock lockscreen, vendored upstream sources)
 - `NOTES.md` — working notes: audit results, decisions, pending ideas
 - `AGENTS.md` — instructions for AI assistants working on this repo
 
@@ -129,7 +136,7 @@ Updated dynamically as work lands.
 | Top bar — battery, calendar, FA7 icons, wifi module | 100% |
 | Wifi popup — click bars, gtk-layer-shell app: live list, 8 rows, inline PSK, info view, click-outside/ESC | 100% |
 | Audio — pipewire/wireplumber, working volume keys and sound | 100% |
-| Screen lock — swaylock/swayidle, keybind, lid closes lock | 100% |
+| Lock screen — gtklock: black, box on typing, dots, hold-to-reveal eye; Super+L, lid, idle | 100% |
 | Power menu — power button opens lock/suspend/logout/reboot/shutdown | 100% |
 | Setup menu — working entries only (dead Wi-Fi entry removed) | 100% |
 | keyd — Chromebook top-row remap (brightness/volume/media) | 100% |

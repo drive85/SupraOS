@@ -78,6 +78,10 @@ chmod +x "$B/restore.sh"
 
 ## 4. Repo hygiene
 
+- The lockscreen is patched gtklock (`dev/lock-app/`, vendored upstream
+  sources, GPL — keep sources next to the payload binary). Never re-add
+  swaylock: its ring indicator was explicitly rejected. `swaylock` and
+  `supra-wifi-fix.sh` were deleted on purpose, do not resurrect them.
 - Git identity is `drive85 <drive85@users.noreply.github.com>` — the user's
   real name must appear nowhere in commits, files, or docs.
 - Never commit or push unless the user explicitly says so; pushes happen with

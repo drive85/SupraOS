@@ -1,0 +1,103 @@
+--- a/meson.build
++++ b/meson.build
+@@ -48,11 +48,13 @@
+   dependencies : dependencies,
+   c_args : [
+     '-DLIBDIR=' + libdir,
++    '-D_DEFAULT_SOURCE',
+     '-DMAJOR_VERSION=' + major_version,
+     '-DMINOR_VERSION=' + minor_version,
+     '-DMICRO_VERSION=' + micro_version,
+   ],
+-  install : true
++  install : true,
++  export_dynamic : true
+ )
+ 
+ install_data(
+--- a/res/gtklock.ui
++++ b/res/gtklock.ui
+@@ -46,6 +46,7 @@
+ 							<object class="GtkLabel" id="input-label">
+ 								<property name="name">input-label</property>
+ 								<property name="label" translatable="yes">Password:</property>
++						<property name="no-show-all">1</property>
+ 							</object>
+ 							<packing>
+ 								<property name="left-attach">0</property>
+@@ -55,12 +56,13 @@
+ 						<child>
+ 							<object class="GtkEntry" id="input-field">
+ 								<property name="name">input-field</property>
+-								<property name="width-request">380</property>
++								<property name="width-request">300</property>
+ 								<property name="visibility">0</property>
+ 								<property name="caps-lock-warning">0</property>
+ 								<property name="input-purpose">password</property>
+ 								<property name="secondary-icon-name">view-reveal-symbolic</property>
+-								<signal name="icon-release" handler="window_pw_toggle_vis"/>
++								<signal name="icon-press" handler="window_pw_show"/>
++								<signal name="icon-release" handler="window_pw_hide"/>
+ 								<signal name="activate" handler="window_pw_check"/>
+ 							</object>
+ 							<packing>
+@@ -115,6 +117,7 @@
+ 									<object class="GtkButton" id="unlock-button">
+ 										<property name="name">unlock-button</property>
+ 										<property name="label" translatable="yes">Unlock</property>
++							<property name="no-show-all">1</property>
+ 										<style>
+ 											<class name="suggested-action"/>
+ 										</style>
+--- a/src/window.c
++++ b/src/window.c
+@@ -188,12 +188,16 @@
+ 	gtk_entry_set_visibility(entry, visibility);
+ }
+ 
+-void window_pw_toggle_vis(GtkEntry* entry, GtkEntryIconPosition icon_pos) {
++void window_pw_show(GtkEntry* entry, GtkEntryIconPosition icon_pos) {
+ 	if(icon_pos != GTK_ENTRY_ICON_SECONDARY) return;
+-	gboolean visibility = gtk_entry_get_visibility(entry);
+-	window_pw_set_vis(entry, !visibility);
++	window_pw_set_vis(entry, TRUE);
+ }
+ 
++void window_pw_hide(GtkEntry* entry, GtkEntryIconPosition icon_pos) {
++	if(icon_pos != GTK_ENTRY_ICON_SECONDARY) return;
++	window_pw_set_vis(entry, FALSE);
++}
++
+ static void window_destroy_notify(GtkWidget *widget, gpointer data) {
+ 	struct Window *win = window_by_widget(widget);
+ 	module_on_window_destroy(gtklock, win);
+@@ -274,9 +278,21 @@
+ 
+ static gboolean entry_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data) {
+ 	if(event->button != 1) return TRUE;
++	GdkRectangle icon_area;
++	gtk_entry_get_icon_area(GTK_ENTRY(widget), GTK_ENTRY_ICON_SECONDARY, &icon_area);
++	if(event->x >= icon_area.x && event->x < icon_area.x + icon_area.width)
++		return FALSE;
++	window_pw_set_vis(GTK_ENTRY(widget), FALSE);
+ 	return FALSE;
+ }
+ 
++static gboolean window_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data) {
++	struct Window *win = window_by_widget(widget);
++	if(win && win->input_field)
++		window_pw_set_vis(GTK_ENTRY(win->input_field), FALSE);
++	return FALSE;
++}
++
+ static gboolean window_enter_notify(GtkWidget *widget, gpointer data) {
+ 	struct Window *win = window_by_widget(widget);
+ 	gtk_entry_grab_focus_without_selecting(GTK_ENTRY(win->input_field));
+@@ -348,6 +364,7 @@
+ 
+ 	w->input_field = GTK_WIDGET(gtk_builder_get_object(builder, "input-field"));
+ 	g_signal_connect(w->input_field, "button-press-event", G_CALLBACK(entry_button_press), NULL);
++	g_signal_connect(w->window, "button-press-event", G_CALLBACK(window_button_press), NULL);
+ 
+ 	w->message_revealer = GTK_WIDGET(gtk_builder_get_object(builder, "message-revealer"));
+ 	w->message_scrolled_window = GTK_WIDGET(gtk_builder_get_object(builder, "message-scrolled-window"));

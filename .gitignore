@@ -1,1 +1,4 @@
 dev/wifi-app/supra-wifi-app
+
+# built binaries / build dirs
+dev/lock-app/build/
