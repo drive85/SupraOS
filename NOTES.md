@@ -259,6 +259,12 @@ Not restorable by this script (by design / needs separate decision):
 7. Minor: no file manager daemon / gvfs services enabled — pcmanfm may lack
    trash/mount features without gvfs backends running.
 
+8. **USB drive support** — added `exfatprogs` and `ntfs-3g` packages for
+   exFAT/NTFS filesystem support, and polkit rule `/etc/polkit-1/localauthority/50-local.d/00-supra-usb.pkla`
+   allowing user erick to mount/unmount/eject removable drives via GVFS/udisks2.
+   pcmanfm is configured with `mount_removable=1` and `autorun=1`. Volume keys
+   and device handling are now functional when a USB drive is connected.
+
 ## Key bindings (current)
 
 - Super+Return: foot | Super+Space: fuzzel | Super+W: kill | Super+F: fullscreen
@@ -266,13 +272,34 @@ Not restorable by this script (by design / needs separate decision):
 - Alt+Tab / Alt+Shift+Tab: focus cycle
 - Super+HJ K; / arrows: focus, +Shift: move, Super+V: splitv (right uses ; since Super+L locks)
 - Workspaces 1-9, move with Shift
-- XF86 keys: volume (wpctl — nonfunctional, see #2), brightness (brightnessctl)
+- XF86 keys: volume (wpctl/PipeWire, capped at 100%), brightness (brightnessctl)
 
 ## Ideas for later
 
-- Replace wpctl binds with pamixer or fix pipewire
-- Add swaylock/swayidle (nothing locks the screen currently)
-- Consider a brightness/volume indicator module in waybar
-- Network: wpa_supplicant on boot, but no tray applet — consider nmtui wrapper or
-  waybar network click action
-- Bootstrap script: could validate that extraction succeeded (currently just `|| true`)
+- Real ANSI colors in foot (see #5) if the flat palette ever bothers you.
+- gvfs backends if pcmanfm trash/mounts matter (see #7).
+
+## Maintenance run (Nov 18 2026)
+
+- Removed 129 packages (~548 MiB) of leftovers: build toolchain used to make
+  gtklock/wifi-app (gcc, binutils, meson, ninja, pkgconf, musl-dev, glib-dev,
+  gtk+3.0-dev, gtk-layer-shell-dev, linux-pam-dev, wayland-dev,
+  wayland-protocols and their deps: python3, docbook, libxslt, ...) and the
+  `.wtype` test virtual + wtype. Rebuild deps now come from `dev/deps.sh`
+  (run as root only when rebuilding, then `apk del` them again).
+- But removing those exposed a real bug: gtklock links `libpam.so.0`, which had
+  only been installed by swaylock before. `linux-pam` is now in the bootstrap
+  apk list.
+- Deleted one-shot helpers `~/.local/bin/supra-brightness-fix.sh` (the bootstrap
+  already writes /etc/local.d/brightness.start) and `supra-dev-deps.sh`
+  (replaced by dev/deps.sh in the repo; it was shipped in the payload).
+- acpid: busybox provides `/sbin/acpid` and the service was enabled, so it ran
+  and watched the dead /proc/acpi/event. Power goes through keyd → F13 now, so
+  the service is off and no longer enabled by the bootstrap.
+- Merged the two duplicate `input type:touchpad` blocks in the sway config
+  (second one silently won; now one block with tap, dwt, natural_scroll,
+  clickfinger).
+- Removed the duplicated selector block in waybar style.css.
+- gtklock config no longer hardcodes `style=/home/erick/...`; upstream falls
+  back to the XDG path `~/.config/gtklock/style.css`.
+- Dropped `supra-bootstrap.day1.bak.sh` from the repo (git history keeps it).

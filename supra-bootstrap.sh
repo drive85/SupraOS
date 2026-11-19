@@ -11,7 +11,7 @@ case "$OPENCODE_ANS" in y*|Y*) OPENCODE_WANT=1 ;; *) OPENCODE_WANT=0 ;; esac
 su -c "
   sed -i 's/^#\(.*community\)/\1/' /etc/apk/repositories
   apk update
-  apk add adwaita-icon-theme alpine-base alsa-ucm-conf alsa-utils bash brightnessctl busybox-mdev-openrc dbus doas dosfstools e2fsprogs elogind eudev $FIREFOX_PKG font-awesome font-dejavu foot fuzzel gdk-pixbuf git grim grub-efi gtk+3.0 gvfs iw keyd linux-firmware linux-firmware-i915 linux-firmware-intel linux-firmware-mediatek linux-firmware-other linux-firmware-rtl_bt linux-lts mesa-dri-gallium openssh openssl pcmanfm pipewire pipewire-alsa pipewire-pulse polkit-elogind seatd seatd-openrc slurp sway swayidle udev-init-scripts udev-init-scripts-openrc waybar wireless-regdb wireplumber wl-clipboard wpa_supplicant 
+  apk add adwaita-icon-theme alpine-base alsa-ucm-conf alsa-utils bash brightnessctl busybox-mdev-openrc dbus doas dosfstools e2fsprogs elogind eudev exfatprogs ntfs-3g $FIREFOX_PKG font-awesome font-dejavu foot fuzzel gdk-pixbuf git grim grub-efi gtk+3.0 gvfs iw keyd linux-firmware linux-firmware-i915 linux-firmware-intel linux-firmware-mediatek linux-firmware-other linux-firmware-rtl_bt linux-lts linux-pam mesa-dri-gallium openssh openssl pcmanfm pipewire pipewire-alsa pipewire-pulse polkit-elogind seatd seatd-openrc slurp sway swayidle udev-init-scripts udev-init-scripts-openrc waybar wireless-regdb wireplumber wl-clipboard wpa_supplicant 
   mkdir -p /etc/keyd
   cat << 'KEYD' > /etc/keyd/cros.conf
 [ids]
@@ -142,6 +142,15 @@ SA
   printf 'permit nopass %s cmd /usr/local/bin/supra-session-action\n' \"$TARGET_USER\" > /etc/doas.d/99-supra-session.conf
   printf 'auth required pam_unix.so\naccount required pam_unix.so\n' > /etc/pam.d/gtklock
   chmod 644 /etc/pam.d/gtklock
+  mkdir -p /etc/polkit-1/localauthority/50-local.d
+  cat << 'POLICY' > /etc/polkit-1/localauthority/50-local.d/00-supra-usb.pkla
+[SupraOS USB Mount]
+Identity=unix-user:erick
+Action=org.freedesktop.udisks2.filesystem-mount;org.freedesktop.udisks2.filesystem-unmount;org.freedesktop.udisks2.drive-eject
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
+POLICY
   sed -i 's/^#\?HandlePowerKey=.*/HandlePowerKey=ignore/; s/^#\?HandleLidSwitch=.*/HandleLidSwitch=ignore/; s/^#\?HandleLidSwitchExternalPower=.*/HandleLidSwitchExternalPower=ignore/' /etc/elogind/logind.conf
   mkdir -p /etc/local.d
   cat << 'BR' > /etc/local.d/brightness.start
@@ -169,7 +178,6 @@ BR
   rc-update add sysctl boot 2>/dev/null || true
   rc-update add syslog boot 2>/dev/null || true
   rc-update add wpa_supplicant boot 2>/dev/null || true
-  rc-update add acpid default 2>/dev/null || true
   rc-update add cgroups default 2>/dev/null || true
   rc-update add crond default 2>/dev/null || true
   rc-update add dbus default 2>/dev/null || true
