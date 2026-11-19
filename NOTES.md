@@ -333,3 +333,25 @@ Not restorable by this script (by design / needs separate decision):
 - Repo: list >50M files, remove junk, git gc.
 - Docs in `dev/DEBLOAT.md`. Intent: run after long sessions or on "debloat" request.
 
+## Media & editor research (Nov 19 2026)
+
+Pending features: Image/Video viewer, Text editor.
+
+Candidates evaluated on Alpine, minimal size + functionality:
+
+Image viewer:
+- `imv` 15 KiB, Wayland native, MIT, depends only on musl. Best for resources.
+- `nsxiv` 93 KiB, X11 only, needs imlib2/fontconfig/X11 — heavier on a Wayland stack.
+- `feh`  ... heavier deps.
+
+Video player:
+- `mpv` 2.7 MiB installed, full-featured, Wayland, hardware decode support. Depends on ffmpeg libs already pulled by system.
+- `ffmpeg` 624 KiB provides `ffplay`. Can be used as ultra-minimal player, but UX is basic.
+Recommendation: `imv` + `mpv` for best UX/resource balance. `ffmpeg` is fallback if mpv deps too high.
+
+Text editor:
+- `nano` 308 KiB, depends on ncursesw, classic UI, very small.
+- `micro` 14 MiB, Go-based, modern but too heavy for 4 GB Celeron.
+- `neovim` much larger.
+Recommendation: `nano` as default minimal editor.
+
