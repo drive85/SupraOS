@@ -362,3 +362,17 @@ Recommendation: `nano` as default minimal editor.
 - Minimal desktop entries to be added later for fuzzel integration.
 - Roadmap updated: Image/Video viewer and Text editor moved from 0% to 100% pending final UX testing.
 
+## File manager MIME fix (Nov 19 2026)
+
+- pcmanfm Open With was empty / “select an application” for JPEG and Markdown because `gio` rejects desktop entries whose Exec binary does not exist. `imv`/`mpv`/`nano` are in bootstrap but not yet installed on live system.
+- Created user-local desktop entries:
+  `~/.local/share/applications/imv.desktop`, `nano.desktop`, `mpv.desktop`
+  with proper MimeType lists.
+- Added wrappers `~/.local/bin/imv`, `nano`, `mpv` that delegate to the real binary if present, else fallback to `firefox`/`vi`. Wrappers make the desktop files valid for `gio` before packages are installed.
+- Set defaults via `gio mime`:
+  image/* → imv.desktop, text/markdown/text/plain → nano.desktop
+  This writes `~/.config/mimeapps.list`.
+- Result: pcmanfm now shows apps in Open With and defaults to imv for images and nano for Markdown. After `apk add imv mpv nano` the wrappers automatically use the real binaries.
+- Backup: `~/opencode/build-backups/desktop-mime-20261119-134315/`
+- Note: `mimeapps.list` is tracked by bootstrap; refresh payload if you want the defaults to survive a restore.
+
