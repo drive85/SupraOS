@@ -192,11 +192,11 @@ BR
   addgroup $TARGET_USER audio 2>/dev/null || true
   # SupraOS boot splash: copy splash image and configure GRUB for quiet boot with background
   mkdir -p /boot/grub
-  cp "$HOME/SupraOS/wallpaper/SupraOS-splash.jpg" /boot/grub/splash.jpg 2>/dev/null || true
+  cp \"$HOME/SupraOS/wallpaper/SupraOS-splash.jpg\" /boot/grub/splash.jpg 2>/dev/null || true
   if [ -f /etc/default/grub ]; then
-    grep -q '^GRUB_BACKGROUND=' /etc/default/grub || echo 'GRUB_BACKGROUND="/boot/grub/splash.jpg"' >> /etc/default/grub
-    sed -i 's/^GRUB_BACKGROUND=.*/GRUB_BACKGROUND="\/boot\/grub\/splash.jpg"/' /etc/default/grub
-    sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT="[^"]*"/GRUB_CMDLINE_LINUX_DEFAULT="modules=sd-mod,usb-storage,ext4 quiet loglevel=0 rootfstype=ext4"/' /etc/default/grub
+    grep -q '^GRUB_BACKGROUND=' /etc/default/grub || echo 'GRUB_BACKGROUND=\"/boot/grub/splash.jpg\"' >> /etc/default/grub
+    sed -i 's/^GRUB_BACKGROUND=.*/GRUB_BACKGROUND=\"\/boot\/grub\/splash.jpg\"/' /etc/default/grub
+    sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*\"/GRUB_CMDLINE_LINUX_DEFAULT=\"modules=sd-mod,usb-storage,ext4 quiet loglevel=0 rootfstype=ext4\"/' /etc/default/grub
     grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || true
   fi
   # Optional toggle for boot logs (keybind-ready helper)
@@ -204,20 +204,20 @@ BR
 #!/bin/sh
 # Toggle SupraOS quiet boot splash on/off
 GRUB=/etc/default/grub
-if grep -q 'quiet loglevel=0' "$GRUB"; then
-  sed -i 's/quiet loglevel=0//' "$GRUB"
-  sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 loglevel=7"/' "$GRUB"
+if grep -q 'quiet loglevel=0' \"$GRUB\"; then
+  sed -i 's/quiet loglevel=0//' \"$GRUB\"
+  sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 loglevel=7\"/' \"$GRUB\"
   echo 'Boot logs enabled (verbose)'
 else
-  sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)loglevel=[^"]*"/GRUB_CMDLINE_LINUX_DEFAULT="\1 quiet loglevel=0"/' "$GRUB" || true
-  sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 quiet loglevel=0"/' "$GRUB"
+  sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)loglevel=[^\"]*\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 quiet loglevel=0\"/' \"$GRUB\" || true
+  sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 quiet loglevel=0\"/' \"$GRUB\"
   echo 'Boot splash enabled (quiet)'
 fi
 grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || true
 TOGGLE
   chmod +x /usr/local/bin/supra-toggle-boot-logs
   # Allow user to toggle via doas nopass (optional keybind)
-  printf 'permit nopass %s cmd /usr/local/bin/supra-toggle-boot-logs\n' "$TARGET_USER" > /etc/doas.d/98-supra-toggle.conf 2>/dev/null || true
+  printf 'permit nopass %s cmd /usr/local/bin/supra-toggle-boot-logs\n' \"$TARGET_USER\" > /etc/doas.d/98-supra-toggle.conf 2>/dev/null || true
 "
 base64 -d << 'ARCHIVE' | tar -xzf - -C ~/ 
 ARCHIVE
