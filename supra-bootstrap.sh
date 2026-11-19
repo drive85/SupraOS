@@ -11,7 +11,7 @@ case "$OPENCODE_ANS" in y*|Y*) OPENCODE_WANT=1 ;; *) OPENCODE_WANT=0 ;; esac
 su -c "
   sed -i 's/^#\(.*community\)/\1/' /etc/apk/repositories
   apk update
-  apk add adwaita-icon-theme alpine-base alsa-ucm-conf alsa-utils bash brightnessctl busybox-mdev-openrc dbus doas dosfstools e2fsprogs elogind eudev exfatprogs ntfs-3g $FIREFOX_PKG font-awesome font-dejavu foot fuzzel gdk-pixbuf git grim grub-efi gtk+3.0 gvfs iw keyd linux-firmware linux-firmware-i915 linux-firmware-intel linux-firmware-mediatek linux-firmware-other linux-firmware-rtl_bt linux-lts linux-pam mesa-dri-gallium openssh openssl pcmanfm pipewire pipewire-alsa pipewire-pulse polkit-elogind seatd seatd-openrc slurp sway swayidle udev-init-scripts udev-init-scripts-openrc waybar wireless-regdb wireplumber wl-clipboard wpa_supplicant 
+  apk add adwaita-icon-theme alpine-base alsa-ucm-conf alsa-utils bash brightnessctl busybox-mdev-openrc dbus doas dosfstools e2fsprogs elogind eudev exfatprogs ntfs-3g $FIREFOX_PKG font-awesome font-dejavu foot fuzzel gdk-pixbuf git grim grub-efi gtk+3.0 gvfs iw keyd linux-firmware linux-firmware-i915 linux-firmware-intel linux-firmware-mediatek linux-firmware-other linux-firmware-rtl_bt linux-lts linux-pam mesa-dri-gallium openssh openssl pcmanfm pipewire pipewire-alsa pipewire-pulse polkit-elogind seatd seatd-openrc slurp sway swayidle udisks2 udisks2-openrc udev-init-scripts udev-init-scripts-openrc waybar wireless-regdb wireplumber wl-clipboard wpa_supplicant 
   mkdir -p /etc/keyd
   cat << 'KEYD' > /etc/keyd/cros.conf
 [ids]

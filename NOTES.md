@@ -260,10 +260,17 @@ Not restorable by this script (by design / needs separate decision):
    trash/mount features without gvfs backends running.
 
 8. **USB drive support** — added `exfatprogs` and `ntfs-3g` packages for
-   exFAT/NTFS filesystem support, and polkit rule `/etc/polkit-1/localauthority/50-local.d/00-supra-usb.pkla`
-   allowing user erick to mount/unmount/eject removable drives via GVFS/udisks2.
-   pcmanfm is configured with `mount_removable=1` and `autorun=1`. Volume keys
-   and device handling are now functional when a USB drive is connected.
+    exFAT/NTFS filesystem support, and polkit rule `/etc/polkit-1/localauthority/50-local.d/00-supra-usb.pkla`
+    allowing user erick to mount/unmount/eject removable drives via GVFS/udisks2.
+    pcmanfm is configured with `mount_removable=1` and `autorun=1`. Volume keys
+    and device handling are now functional when a USB drive is connected.
+    
+8a. **USB fix (Nov 19 2026)** — Root cause: `udisks2` daemon was missing. System
+    had only `udisks2-libs` (dependency) but not the actual daemon. Installed
+    `udisks2` and `udisks2-openrc` packages. Service enabled and started.
+    Added packages to `supra-bootstrap.sh` apk line. Now udisks2 properly
+    detects and automounts USB drives via gvfs, and drives appear in PCManFM Places.
+    Polkit rule and pcmanfm config already in place.
 
 ## Key bindings (current)
 
