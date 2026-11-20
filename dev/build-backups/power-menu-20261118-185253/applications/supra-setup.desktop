@@ -1,5 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Setup
-GenericName=Wi-Fi, Audio & Configs
-Exec=sh -c 'c=$(printf "Wi-Fi (nmtui)\nAudio Mixer (alsamixer)\nEdit Sway Config\nEdit Waybar Config\nEdit Fuzzel Config" | fuzzel --dmenu --prompt="> " --lines=8); case "$c" in "Wi-Fi"*) exec foot -e nmtui;; "Audio"*) exec foot -e alsamixer;; "Edit Sway"*) exec foot -e vi ~/.config/sway/config;; "Edit Waybar"*) exec foot -e vi ~/.config/waybar/config;; "Edit Fuzzel"*) exec foot -e vi ~/.config/fuzzel/fuzzel.ini;; esac'

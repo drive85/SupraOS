@@ -1,4 +1,36 @@
+# built app binary (rebuild with dev/wifi-app/build.sh)
 dev/wifi-app/supra-wifi-app
 
-# built binaries / build dirs
+# build dirs / generated objects
 dev/lock-app/build/
+build/
+out/
+dist/
+*.o
+
+# local timestamped config snapshots, never source
+dev/build-backups/
+
+# disk images / ISO payloads (large and reproducible)
+*.iso
+*.img
+*.raw
+*.qcow2
+*.vmdk
+payload*.b64
+
+# editor / OS junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+*.orig
+*.rej
+
+# logs / caches / crash dumps
+*.log
+.cache/
+__pycache__/
+core
+core.*
