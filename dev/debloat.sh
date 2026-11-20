@@ -1,7 +1,7 @@
 #!/bin/sh
 # SupraOS debloat — minimal, safe cleanup for Chromebook 12
 # Usage: ./debloat.sh [system|dev|repo|all]
-# Creates timestamped backups before any config-changing step.
+# Only touches caches, logs, /tmp and repo junk; never configs.
 set -e
 set -u
 
@@ -11,15 +11,6 @@ exec >>"$LOG" 2>&1
 
 echo "=== SupraOS debloat $TS ==="
 echo "Log: $LOG"
-
-backup() {
-  # $1 component name, $2... files
-  comp="$1"; shift
-  B=~/opencode/build-backups/${comp}-$TS
-  mkdir -p "$B"
-  for f in "$@"; do [ -e "$f" ] && cp -a "$f" "$B"/; done
-  echo "Backup $comp -> $B"
-}
 
 root() {
   su -c "$*"
@@ -60,19 +51,14 @@ dev_cleanup() {
   # Remove stray supra-autologin scripts if any
   rm -f /usr/local/bin/supra-autologin.sh || true
 
-  echo "[dev] User cache safe prune"
-  # Keep supra caches
-  KEEP="supra-brightness supra-wifi"
-  # make a backup of caches before wiping
-  backup caches ~/.cache
+  echo "[dev] User cache prune (regenerable; keep supra-* file or dir)"
   find ~/.cache -mindepth 1 -maxdepth 1 ! -name "supra-*" -exec rm -rf {} + || true
-  for k in $KEEP; do mkdir -p ~/.cache/$k; done
 }
 
 repo_cleanup() {
   REPO=~/SupraOS
   echo "[repo] Finding large files >50M"
-  find "$REPO" -type f -size +50M -print
+  find "$REPO" -type f -size +51200k -print
 
   echo "[repo] Removing common junk"
   find "$REPO" -type f \( -name ".DS_Store" -o -name "*.swp" -o -name "*~" \) -delete || true

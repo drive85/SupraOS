@@ -376,3 +376,52 @@ Recommendation: `nano` as default minimal editor.
 - Backup: `~/opencode/build-backups/desktop-mime-20261119-134315/`
 - Note: `mimeapps.list` is tracked by bootstrap; refresh payload if you want the defaults to survive a restore.
 
+## Horizon client removal + debloat (Nov 20 2026)
+
+- Horizon was a self-installed Minecraft launcher (not an apk package): 2.1G in
+  `~/.local/share/horizon-launcher`, 592K in `~/.local/share/horizon`, icons,
+  two `.desktop` files, `~/.config/horizon-launcher-location`, empty `~/games`.
+  All deleted; game data/accounts NOT backed up. Small `.desktop`/icons and
+  package manifests are in `~/opencode/build-backups/horizon-20261120-075629/`.
+- Packages installed for it and removed (`apk del`): `openjdk25-jre` (+headless,
+  java-common, java-cacerts, p11-kit-trust, giflib) and `gcompat`
+  (+libucontext, musl-obstack). Also removed the on-demand dev toolchain
+  `gcc`/`musl-dev` (+binutils, libgcc-static, libatomic, isl26, jansson, mpc1);
+  `dev/deps.sh` reinstalls it when rebuilding.
+- debloat.sh fixed for BusyBox: `-size +50M` is invalid (use `+51200k`); the
+  cache KEEP loop called `mkdir -p ~/.cache/supra-brightness`, which is a file,
+  so `set -e` aborted the run after pruning. KEEP/mkdir loop removed; the
+  `! -name "supra-*"` filter already preserves both caches.
+- debloat.sh `root()` now calls plain `su -c` (interactive password prompts)
+  instead of piping a hardcoded password. Local history was rewritten to
+  remove it (all commits from `d21a7e7` on have new hashes); the remote still
+  needs a force-push. Cache backups are no longer written into the repo —
+  `~/.cache` is regenerable and 724 MB of Firefox cache had accumulated in
+  `dev/build-backups/`.
+
+
+## Install strategy — options to review (Nov 20 2026)
+
+Research only, nothing built yet. The current script is provisioning, not an
+installer (it assumes Alpine is already installed, run as a user, repo at
+`$HOME/SupraOS`, hardcoded `erick` in polkit, Chromebook keyd IDs).
+
+- **Option A — raw disk image (truest 1:1).** Alpine's
+  `alpine-make-vm-image` (v0.13.4, packaged in v3.24). Build a bootable raw
+  image with `--image-format raw --boot-mode UEFI|BIOS --script-chroot`,
+  then `dd` it to the target disk. Fewest moving parts, reproducible, offline.
+  Downsides: fixed image size (target disk must be >=), no partitioning or
+  encryption menu, per-machine identity must be templated.
+- **Option B — custom ISO installer (Omarchy-style).** Alpine's official
+  `mkimage` from aports: `abuild`, `alpine-conf`, `syslinux`, `xorriso`,
+  `squashfs-tools`, `grub`, `mtools`; a `mkimg.supraos.sh` profile plus
+  `apkovl`/`genapkovl-*`. Live squashfs ISO whose installer runs
+  `setup-alpine`/`setup-disk` (or manual partitioning) and then provisions in
+  a chroot. Flexible, distributable, BIOS+UEFI, dual-boot/encryption possible.
+  Downsides: most build complexity.
+
+Either route needs the same refactor: one authoritative package list,
+root-aware idempotent provisioning, templated user/home (no hardcoded
+`erick`/`$HOME/SupraOS`), a generic-vs-Chromebook hardware profile, prebuilt
+gtklock binary, and exclusion of personal data (Firefox profile, Wi-Fi PSK,
+SSH keys, machine-id, caches). Review before building.
