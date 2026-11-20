@@ -5,90 +5,46 @@ description: Use ONLY when developing or debugging SupraOS — its waybar/sway/f
 
 # SupraOS development rules
 
-SupraOS is the user's personal Alpine Linux mod (Omarchy-inspired) on weak
-hardware (Dell Chromebook 12, 2-core Celeron, 4 GB RAM, Sway + waybar).
-`~/SupraOS/AGENTS.md` and `NOTES.md` are the source of truth for environment
-facts and past decisions — read them before acting. Apply every rule below on
-every SupraOS task.
+SupraOS is personal Alpine Linux mod (Omarchy-inspired) on weak hardware: Dell Chromebook 12, 2-core Celeron, 4 GB RAM, Sway + waybar. Source of truth: `~/SupraOS/AGENTS.md` and `NOTES.md`. Read them before acting.
 
-## 1. Research first — never reinvent the wheel
+## 0. Execution style – focus, speed, low tokens
 
-Before writing any functionality, look at how it is already solved:
+- No overthinking. Stay on task, no rabbit holes, no speculative alternatives unless asked.
+- Think precisely, decide boldly. Pick smallest viable solution and execute. Do not wander.
+- Work fast, use less tokens: keep outputs concise, avoid repetition, condense explanations, skip verbose intros. Prefer bullet points over prose.
+- Research is limited to what's necessary to decide. Verify on-device, then act.
 
-- **Omarchy is the reference project — for functionality and looks only.**
-  Check the official Omarchy repo and docs (github.com/basecamp/omarchy,
-  omarchy.org) for how it solves the same desktop element (bar modules, menus,
-  OSD, lock, defaults) and copy its behaviour and visual language freely and
-  credit it. But Omarchy targets robust, modern hardware; SupraOS targets a
-  2-core Celeron with 4 GB RAM. Never copy its technical stack (Hyprland,
-  Electron, Rust/GTK4 daemons, NetworkManager) just because Omarchy uses it —
-  pick the smallest thing that just works here, even if it is a different tool
-  or a 20-line script. When in doubt: fewer daemons, less memory, faster start.
-- **Upstream docs of the actual package beat memory and guesses.** Waybar,
-  sway, wlroots/layer-shell, foot, fuzzel, wpa_supplicant: check the official
-  man pages, wiki, and source for the EXACT installed version. Verify
-  capabilities on-device before trusting docs:
-  `waybar --version`, `zcat /usr/share/man/man5/<page>.5.gz`,
-  `strings /usr/bin/<bin> | grep <feature>` (e.g. proved waybar menu support),
-  or fetch the source at the matching release tag.
-- If a feature exists natively in an installed tool (e.g. waybar menus,
-  drawers), use it before considering scripts, popups, or new packages.
-- Reject heavy ecosystems (Rust/Python/GTK4 widget frameworks, NetworkManager
-  stacks) unless nothing lighter works: this machine is musl/Alpine on a
-  Celeron.
+## 1. Research first
+
+- Omarchy reference for functionality/looks only, not tech stack. Copy behaviour/visuals, credit it. Never copy Hyprland/Electron/Rust/GTK4/NetworkManager. Choose smallest working thing; fewer daemons, less memory, faster start.
+- Upstream docs beat memory. For waybar/sway/wlroots/foot/fuzzel/wpa_supplicant, check man pages/wiki/source for exact installed version. Verify on-device: `waybar --version`, `zcat /usr/share/man/man5/...`, `strings /usr/bin/... | grep ...`. Use native features before scripts/popups/packages.
+- Reject heavy ecosystems unless lighter option impossible.
 
 ## 2. Minimal always
 
-- Zen minimalism: delete before adding. Every package, daemon and module must
-  earn its RAM and startup time. Fast beats pretty, working beats clever.
-- Smallest change that solves the stated problem: minimal code, minimal
-  interface, minimal config, minimal dependencies. No features, options, help
-  text, or polish beyond what the user asked for.
-- Shell scripts: POSIX sh for BusyBox ash. No bashisms, no GNU-only flags.
-  One script per job, few lines each, comments only when non-obvious.
-- Do not add packages unless the feature truly requires one; if adding one,
-  keep `/etc/apk/world` in sync with the `apk add` list in supra-bootstrap.sh.
-- Prefer deleting over fixing when a mechanism fights the user (several
-  scrapped experiments in NOTES.md won by being removed).
+- Delete before adding. Every package/daemon/module must earn RAM/startup time. Fast > pretty, working > clever.
+- Smallest change that solves problem: minimal code/config/deps. No extra features/options/polish.
+- Shell: POSIX sh for BusyBox ash, no bashisms/GNU-only flags. One script per job, few lines, comments only when non-obvious.
+- Do not add packages unless required; keep `/etc/apk/world` in sync with `apk add` in supra-bootstrap.sh.
+- Prefer deleting over fixing mechanisms that fight user.
 
-## 3. Non-destructive: automated backup BEFORE touching working elements
+## 3. Non-destructive backups
 
-Any time you modify a working element — waybar/sway/foot/fuzzel/gtk configs,
-supra-* scripts, waybar restarts during experiments, supra-bootstrap.sh —
-FIRST make an automated timestamped backup. Never skip this, even for "small"
-edits:
-
+Before touching waybar/sway/foot/fuzzel/gtk configs, supra-* scripts, supra-bootstrap.sh:
 ```sh
 TS=$(date +%Y%m%d-%H%M%S)
-B=~/opencode/build-backups/<component>-$TS   # e.g. waybar-20261117-070546
+B=~/opencode/build-backups/<component>-$TS
 mkdir -p "$B"
-cp <every file you are about to touch, plus its related scripts> "$B"/
-printf '#!/bin/sh\ncp <files> <original paths> && <reload command>\n' > "$B/restore.sh"
+cp <files+related scripts> "$B"/
+printf '#!/bin/sh\ncp <files> <paths> && <reload>\n' > "$B/restore.sh"
 chmod +x "$B/restore.sh"
 ```
-
-- Backup live files, not intended changes. Include companion scripts
-  (e.g. supra-wifi-* with waybar config) so restore.sh actually restores a
-  working state.
-- After the change: verify alive (e.g. `pgrep waybar`, no errors in log,
-  script syntax `sh -n`, sample script output). If it is broken and the user
-  wants it back, restore from the newest known-good backup — keep
-  `-good-<ts>` snapshots whenever the user approves a state.
-- Experiments the user rejects get deleted, not left in place.
+Backup live files + companions. After change verify alive: `pgrep`, logs, `sh -n`, sample output. If broken, restore newest known-good backup; keep `-good-<ts>` snapshots on approval. Delete rejected experiments.
 
 ## 4. Repo hygiene
 
-- The lockscreen is patched gtklock (`dev/lock-app/`, vendored upstream
-  sources, GPL — keep sources next to the payload binary). Never re-add
-  swaylock: its ring indicator was explicitly rejected. `swaylock` and
-  `supra-wifi-fix.sh` were deleted on purpose, do not resurrect them.
-- Git identity is `drive85 <drive85@users.noreply.github.com>` — the user's
-  real name must appear nowhere in commits, files, or docs.
-- Never commit or push unless the user explicitly says so; pushes happen with
-  the one-shot token URL at the end of a session.
-- Any change to a config captured in supra-bootstrap.sh's embedded tarball
-  requires refreshing the payload (stage live files → `tar -czf - . | base64`
-  → splice between the ARCHIVE markers → extract-and-diff roundtrip check).
-  Include `~/.local/bin/supra-*` scripts in the staging tree.
-- Record non-obvious decisions and scrapped approaches in `~/SupraOS/NOTES.md`
-  so the next session does not repeat them.
+- Lockscreen is patched gtklock (`dev/lock-app/` vendored, GPL). Never re-add swaylock; `swaylock` and `supra-wifi-fix.sh` deleted on purpose.
+- Git identity: `drive85 <drive85@users.noreply.github.com>`. No real name in commits/files/docs.
+- Never commit/push unless explicitly requested; pushes use one-shot token URL.
+- Changes to supra-bootstrap.sh embedded tarball require refresh: stage live files → `tar -czf - . | base64` → splice between ARCHIVE markers → extract-and-diff check. Include `~/.local/bin/supra-*`.
+- Record non-obvious decisions and scrapped approaches in `~/SupraOS/NOTES.md`.

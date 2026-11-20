@@ -425,3 +425,28 @@ root-aware idempotent provisioning, templated user/home (no hardcoded
 `erick`/`$HOME/SupraOS`), a generic-vs-Chromebook hardware profile, prebuilt
 gtklock binary, and exclusion of personal data (Firefox profile, Wi-Fi PSK,
 SSH keys, machine-id, caches). Review before building.
+
+## Archive manager install (Nov 20 2026)
+
+Research: engrampa (MATE) vs ark (KDE). For a 2-core Celeron/4 GB, GTK3 engrampa is the smallest functional GUI archive manager with ZIP/TAR/7Z/RAR support. ark pulls in KDE deps (~100+ MB) and is too heavy.
+
+Chosen: engrampa.
+
+Install on Alpine:
+```
+su -c 'apk add --no-cache engrampa 7zip zip unzip'
+```
+Backends used by engrampa are libarchive; 7zip provides 7z command for 7Z. RAR read works via unrar-free/p7zip.
+
+Desktop entry created once:
+`/home/erick/.local/share/applications/engrampa-archive-manager.desktop`
+Exec=engrampa %U
+Icon=engrampa
+MimeType=...
+
+Previous heavy options removed:
+- ark package removed
+- ark .desktop removed
+- p7zip kept only if needed, otherwise 7zip suffices.
+
+Verified: `which engrampa` → /usr/bin/engrampa

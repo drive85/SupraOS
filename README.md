@@ -27,7 +27,7 @@ One script, one tarball, one monochrome theme.
 | Bar           | Waybar    |
 | Terminal      | foot      |
 | Launcher      | fuzzel    |
-| File manager  | pcmanfm   |
+| File manager  | thunar    |
 | Browser       | Firefox   |
 | Screenshots   | grim + slurp + wl-copy |
 | Audio         | PipeWire + WirePlumber |
@@ -79,7 +79,7 @@ cutting power.
 | Super+Return      | terminal (foot)                 |
 | Super+Space       | launcher (fuzzel)               |
 | Super+B           | Firefox                         |
-| Super+E           | pcmanfm                         |
+| Super+E           | thunar                          |
 | Super+W           | close window                    |
 | Super+F           | fullscreen                      |
 | Super+Arrows/HJ K; | focus (right is ; since L locks) |
@@ -141,7 +141,7 @@ Updated dynamically as work lands.
 | Setup menu — working entries only (dead Wi-Fi entry removed) | 100% |
 | keyd — Chromebook top-row remap (brightness/volume/media) | 100% |
 | Image / Video viewer — imv + mpv | 100% |
-| Text editor — nano | 100% |
+| Text editor — vim | 100% |
 
 ## Known quirks
 
